@@ -8,5 +8,5 @@ pyinstaller \
     -w \
     --add-data "svod_parser_v1:svod_parser_v1/" \
     --add-data "svod_parser_v2:svod_parser_v2/" \
-    -n "Парсер СВОД" \
+    -n "Svod parser" \
     "app.py"
