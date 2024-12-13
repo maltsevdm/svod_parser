@@ -1,0 +1,34 @@
+from enum import IntEnum
+
+
+class SvodColumn(IntEnum):
+    NUMBER = 1
+    NAME_BY_PROJECT = 2
+    APPEARANCE = 3
+    NAME_BY_RP = 4
+    PRICE_WITH_NDS = 6
+    PROVIDER = 9
+    UNITS_FIRST = 11
+    RP_QUANTITY = 141
+    BUILDING_STOCK = 142
+    UNITS_SECOND = 145
+    RP_MATERIALS = 146
+    UNITS_THIRD = 148
+    MATERIALS_RP_FOR_BUY = 149
+
+
+class SpecColumn(IntEnum):
+    NUMBER = 1
+    NAME_BY_PROJECT = 2
+    APPEARANCE = 3
+    NAME_BY_RP = 4
+    PRICE_WITH_NDS = 6
+    PROVIDER = 8
+    UNITS_FIRST = 10
+    TOTAL_QUANTITY = 12  # формула
+    RP_QUANTITY = 13  # формула
+    BUILDING_STOCK = 14
+    UNITS_SECOND = 16
+    RP_MATERIALS = 17
+    UNITS_THIRD = 19
+    MATERIALS_RP_FOR_BUY = 20
