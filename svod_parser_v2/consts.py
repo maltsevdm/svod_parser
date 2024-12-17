@@ -1,6 +1,8 @@
-from .enums import SpecColumn, SvodColumn
+from openpyxl.utils import column_index_from_string as cifs
 
-from openpyxl.utils import column_index_from_string as cifm
+from common.enums import SvodHeaders
+
+from .enums import SpecColumn
 
 TEMPLATE_FILENAME = "template.xlsx"
 
@@ -26,26 +28,23 @@ static_rows = [
 ]
 
 columns_relation = {
-    cifm(SvodColumn.НАИМЕНОВАНИЕ_ПО_ПРОЕКТУ): cifm(SpecColumn.НАИМЕНОВАНИЕ_ПО_ПРОЕКТУ),
-    cifm(SvodColumn.ВНЕШНИЙ_ВИД): cifm(SpecColumn.ВНЕШНИЙ_ВИД),
-    cifm(SvodColumn.НАИМЕНОВАНИЕ_В_РП): cifm(SpecColumn.НАИМЕНОВАНИЕ_В_РП),
-    cifm(SvodColumn.ЦЕНА_ОТ_ЗАКУПОК_С_НДС): cifm(SpecColumn.ЦЕНА_ОТ_ЗАКУПОК_С_НДС),
-    cifm(SvodColumn.ПОСТАВЩИК): cifm(SpecColumn.ПОСТАВЩИК),
-    cifm(SvodColumn.ЕД_ИЗМ): cifm(SpecColumn.ЕД_ИЗМ),
-    cifm(SvodColumn.ЦЕНА_ОТ_ЗАКУПОК_С_НДС_РОЗН): cifm(
-        SpecColumn.ЦЕНА_ОТ_ЗАКУПОК_С_НДС_РОЗН
-    ),
-    cifm(SvodColumn.ОЖИДАЕМАЯ_СКИДКА_К_РОЗН_ЦЕНЕ): cifm(
-        SpecColumn.ОЖИДАЕМАЯ_СКИДКА_К_РОЗН_ЦЕНЕ
-    ),
-    cifm(SvodColumn.ИТОГОВАЯ_ЦЕНА_В_РАСЧЕТЕ): cifm(SpecColumn.ИТОГОВАЯ_ЦЕНА_В_РАСЧЕТЕ),
-    cifm(SvodColumn.ОБЪЕМ_ИЗ_РП): cifm(SpecColumn.ОБЪЕМ_ИЗ_РП),
-    cifm(SvodColumn.ЗАПАС_ПРОЦ): cifm(SpecColumn.ЗАПАС_ПРОЦ),
-    cifm(SvodColumn.ИТОГО_С_ЗАПАСОМ): cifm(SpecColumn.ИТОГО_С_ЗАПАСОМ),
-    cifm(SvodColumn.ЧИСТОВАЯ_ОТДЕЛКА): cifm(SpecColumn.ЧИСТОВАЯ_ОТДЕЛКА),
-    cifm(SvodColumn.ЧИСТОВАЯ_И_КОРПУСНАЯ_МЕБЕЛЬ): cifm(
-        SpecColumn.ЧИСТОВАЯ_И_КОРПУСНАЯ_МЕБЕЛЬ
-    ),
-    cifm(SvodColumn.ПОЛНАЯ_КОМПЛЕКТАЦИЯ): cifm(SpecColumn.ПОЛНАЯ_КОМПЛЕКТАЦИЯ),
-    cifm("FE"): cifm(SpecColumn.ЗАПАС_ПРОЦ),
+    SvodHeaders.НАИМЕНОВАНИЕ_ПО_ПРОЕКТУ: SpecColumn.НАИМЕНОВАНИЕ_ПО_ПРОЕКТУ,
+    SvodHeaders.ВНЕШНИЙ_ВИД: SpecColumn.ВНЕШНИЙ_ВИД,
+    SvodHeaders.НАИМЕНОВАНИЕ_ПОЛНОЕ: SpecColumn.НАИМЕНОВАНИЕ_ПОЛНОЕ,
+    SvodHeaders.ЕД_ИЗМ_1: SpecColumn.ЕД_ИЗМ_1,
+    SvodHeaders.ЦЕНА_ОТ_ЗАКУПОК_ОПТ: SpecColumn.ЦЕНА_ОТ_ЗАКУПОК_ОПТ,
+    SvodHeaders.ЦЕНА_ОТ_ЗАКУПОК_РОЗН: SpecColumn.ЦЕНА_ОТ_ЗАКУПОК_РОЗН,
+    SvodHeaders.ПОСТАВЩИК: SpecColumn.ПОСТАВЩИК,
+    SvodHeaders.ОЖИДАЕМАЯ_СКИДКА_К_ЦЕНЕ: SpecColumn.ОЖИДАЕМАЯ_СКИДКА_К_ЦЕНЕ,
+    SvodHeaders.ИТОГО_ЦЕНА: SpecColumn.ИТОГО_ЦЕНА,
+    SvodHeaders.ЕД_ИЗМ_4: SpecColumn.ЕД_ИЗМ_2,
+    SvodHeaders.ОБЪЕМЫ_С_РП: SpecColumn.ОБЪЕМЫ_С_РП,
+    SvodHeaders.ЕД_ИЗМ_5: SpecColumn.ЕД_ИЗМ_3,
+    SvodHeaders.ОБЪЕМ_ДЛЯ_ЗАКУПА: SpecColumn.ОБЪЕМ_ДЛЯ_ЗАКУПА,
+    SvodHeaders.СТРОИТЕЛЬНЫЙ_ЗАПАС: SpecColumn.СТРОИТЕЛЬНЫЙ_ЗАПАС_ПРОЦ,
+    SvodHeaders.ИТОГО_ОБЪЕМ_С_ЗАПАСОМ_ДЛЯ_ЗАКУПА: SpecColumn.ИТОГО_ОБЪЕМ_С_ЗАПАСОМ_ДЛЯ_ЗАКУПА,
+    SvodHeaders.ИТОГО_СТОИМОСТЬ_ЧИСТОВОЙ_ОТДЕЛКИ: SpecColumn.ИТОГО_СТОИМОСТЬ_ЧИСТОВОЙ_ОТДЕЛКИ,
+    SvodHeaders.ЧИСТОВАЯ_И_КОРПУСНАЯ_МЕБЕЛЬ: SpecColumn.ЧИСТОВАЯ_И_КОРПУСНАЯ_МЕБЕЛЬ,
+    SvodHeaders.ПОЛНАЯ_КОМПЛЕКТАЦИЯ: SpecColumn.ПОЛНАЯ_КОМПЛЕКТАЦИЯ,
+    SvodHeaders.СТРОИТЕЛЬНЫЙ_ЗАПАС_ПРОЦ: SpecColumn.СТРОИТЕЛЬНЫЙ_ЗАПАС_ПРОЦ,
 }

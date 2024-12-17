@@ -6,13 +6,22 @@ from .consts import columns_relation
 from .exceptions import ColumnNotFound
 
 
-def transform_formula(input_string):
+def transform_formula(input_string: str, svod_columns: dict[str, int]) -> str:
     # Используем регулярное выражение для поиска букв + числа
     def replacer(match):
         letter = match.group(1)
 
         col_index_from = column_index_from_string(letter)
-        col_index_to = columns_relation.get(col_index_from)
+
+        header = None
+        for sc, col_index in svod_columns.items():
+            if col_index == col_index_from:
+                header = sc
+                break
+        else:
+            raise ColumnNotFound(f"Не удалось найти колонку {col_index_from}")
+
+        col_index_to = columns_relation.get(header)
 
         if not col_index_to:
             raise ColumnNotFound

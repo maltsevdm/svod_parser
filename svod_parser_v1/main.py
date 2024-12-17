@@ -10,7 +10,9 @@ from openpyxl.utils.cell import get_column_letter
 from openpyxl.worksheet.worksheet import Worksheet
 from openpyxl_image_loader import SheetImageLoader
 
+from common.enums import SvodHeaders
 from common.styles import GREEN_COLOR, thin_border
+from common.utils import get_svod_columns
 
 from .consts import (
     COL_L_FORMULA,
@@ -27,7 +29,7 @@ from .consts import (
     flat_column,
     static_rows,
 )
-from .enums import SpecColumn, SvodColumn
+from .enums import SpecColumn
 from .exceptions import ColumnNotFound
 from .utils import transform_formula
 
@@ -75,6 +77,8 @@ def main(flat_column: int, file_path: pathlib.Path) -> bool:
     wb_new = load_workbook(template_path)
     ws_spec = wb_new.active
 
+    sc = get_svod_columns(ws_svod)
+
     flat_column_i = find_flat_column_index(ws_svod, flat_column)
     if not flat_column_i:
         return False
@@ -85,29 +89,45 @@ def main(flat_column: int, file_path: pathlib.Path) -> bool:
 
     row_spec = 3
     # Квартира
-    ws_spec.cell(1, SpecColumn.RP_QUANTITY, flat)
+    ws_spec.cell(1, SpecColumn.КОЛВО_ДЛЯ_ЗАКУПА_С_РП, flat)
     # Имя
     ws_spec.cell(
         1,
-        SpecColumn.RP_QUANTITY + 1,
+        SpecColumn.КОЛВО_ДЛЯ_ЗАКУПА_С_РП + 1,
         ws_svod.cell(ROW_NAMES, flat_column_i).value,
     )
 
     i = 1
 
-    image_loader = SheetImageLoader(ws_svod)
+    
+    try:
+        image_loader = SheetImageLoader(ws_svod)
+    except IndexError as ex:
+        if "string index out of range" in str(ex):
+            messagebox.showerror(
+                "Ошибка",
+                "В своде скорее всего есть картинки в столбцах кроме Внешний вид. "
+                "Удалите их и попробуйте снова.",
+            )
+            return
+        raise ex
 
     # Переносим данные
     for row in range(ROW_FLATS + 1, ws_svod.max_row + 1):
-        if str(ws_svod.cell(row, 2).value).lower() in static_rows:
-            ws_spec.cell(row_spec, 1, ws_svod.cell(row, 2).value.upper())
+        col_static = sc[SvodHeaders.НАИМЕНОВАНИЕ_ПО_ПРОЕКТУ]
+        if str(ws_svod.cell(row, col_static).value).lower() in static_rows:
+            ws_spec.cell(
+                row_spec,
+                1,
+                ws_svod.cell(row, col_static).value.upper(),
+            )
             row_spec += 1
             continue
 
         if not ws_svod.cell(row, flat_column_i).value:
             continue
 
-        cell_address = f"{get_column_letter(SvodColumn.APPEARANCE)}{row}"
+        cell_address = f"{get_column_letter(sc[SvodHeaders.ВНЕШНИЙ_ВИД])}{row}"
 
         if image_loader.image_in(cell_address):
             im = Image(image_loader.get(cell_address))
@@ -124,24 +144,28 @@ def main(flat_column: int, file_path: pathlib.Path) -> bool:
                 im.height = IMAGE_MAX_WIDTH * im.height / im.width
                 im.width = IMAGE_MAX_WIDTH
 
-            cell_address = f"{get_column_letter(SpecColumn.APPEARANCE)}{row_spec}"
+            cell_address = f"{get_column_letter(SpecColumn.ВНЕШНИЙ_ВИД)}{row_spec}"
             ws_spec.add_image(im, cell_address)
 
-        ws_spec.cell(row_spec, SpecColumn.NUMBER, i)
+        ws_spec.cell(row_spec, SpecColumn.НОМЕР, i)
 
         for col_from, col_to in columns_relation.items():
-            ws_spec.cell(row_spec, col_to, ws_svod.cell(row, col_from).value)
+            ws_spec.cell(
+                row_spec,
+                col_to,
+                ws_svod.cell(row, sc[col_from]).value,
+            )
 
         for col_with_formula in [
-            SvodColumn.RP_QUANTITY,
-            SvodColumn.MATERIALS_RP_FOR_BUY,
+            SvodHeaders.КОЛВО_ДЛЯ_ЗАКУПА_С_УЧЕТОМ_ЗАПАСА,
+            SvodHeaders.КОЛВО_ДЛЯ_ЗАКУПА_С_РП,
         ]:
-            value = ws_svod_with_formulas.cell(row, col_with_formula).value
+            value = ws_svod_with_formulas.cell(row, sc[col_with_formula]).value
             if str(value).startswith("="):
                 try:
-                    new_formula = transform_formula(value).format(row=row_spec)
+                    new_formula = transform_formula(value, sc).format(row=row_spec)
                 except ColumnNotFound:
-                    address = f"{get_column_letter(col_with_formula)}{row}"
+                    address = f"{get_column_letter(sc[col_with_formula])}{row}"
                     messagebox.showerror(
                         "Ошибка",
                         f"В своде в ячейке {address} в формуле используется колонка, которой нет в итоговом файле",
@@ -156,14 +180,14 @@ def main(flat_column: int, file_path: pathlib.Path) -> bool:
 
         ws_spec.cell(
             row_spec,
-            SpecColumn.TOTAL_QUANTITY,
+            SpecColumn.КОЛВО_ОБЩЕЕ_ДЛЯ_ЗАКУПА,
             COL_L_FORMULA.format(row=row_spec),
         )
 
         if ws_svod.cell(row, flat_column_i).fill != PatternFill(None):
             ws_spec.cell(
                 row_spec,
-                SpecColumn.RP_MATERIALS,
+                SpecColumn.МАТЕРИАЛЫ_С_РП,
                 ws_svod.cell(row, flat_column_i).value,
             )
 
@@ -192,20 +216,20 @@ def main(flat_column: int, file_path: pathlib.Path) -> bool:
 
         if row >= 3:
             ws_spec.row_dimensions[row].height = ROW_MAIN_HEIGHT
-            ws_spec.cell(row, SpecColumn.BUILDING_STOCK).number_format = "0%"
+            ws_spec.cell(row, SpecColumn.СТРОИТЕЛЬНЫЙ_ЗАПАС).number_format = "0%"
 
-        for col in range(1, SpecColumn.MATERIALS_RP_FOR_BUY + 2):
+        for col in range(1, SpecColumn.МАТЕРИАЛЫ_ДЛЯ_ЗАКУПА_С_РП + 2):
             cell = ws_spec.cell(row, col)
 
             # Делаем зеленые разделительные границы
             if row >= 2 and col - 1 in [
-                SpecColumn.NAME_BY_RP,
-                SpecColumn.PRICE_WITH_NDS,
-                SpecColumn.PROVIDER,
-                SpecColumn.UNITS_FIRST,
-                SpecColumn.BUILDING_STOCK,
-                SpecColumn.RP_MATERIALS,
-                SpecColumn.MATERIALS_RP_FOR_BUY,
+                SpecColumn.НАИМЕНОВАНИЕ_ПО_РП,
+                SpecColumn.ЦЕНА_С_НДС,
+                SpecColumn.ПОСТАВЩИК,
+                SpecColumn.ЕД_ИЗМ_1,
+                SpecColumn.СТРОИТЕЛЬНЫЙ_ЗАПАС,
+                SpecColumn.МАТЕРИАЛЫ_С_РП,
+                SpecColumn.МАТЕРИАЛЫ_ДЛЯ_ЗАКУПА_С_РП,
             ]:
                 cell.fill = PatternFill("solid", GREEN_COLOR)
 
@@ -213,10 +237,10 @@ def main(flat_column: int, file_path: pathlib.Path) -> bool:
                 cell.border = thin_border
 
             if col in [
-                SpecColumn.TOTAL_QUANTITY,
-                SpecColumn.RP_QUANTITY,
-                SpecColumn.RP_MATERIALS,
-                SpecColumn.MATERIALS_RP_FOR_BUY,
+                SpecColumn.КОЛВО_ОБЩЕЕ_ДЛЯ_ЗАКУПА,
+                SpecColumn.КОЛВО_ДЛЯ_ЗАКУПА_С_РП,
+                SpecColumn.МАТЕРИАЛЫ_С_РП,
+                SpecColumn.МАТЕРИАЛЫ_ДЛЯ_ЗАКУПА_С_РП,
             ]:
                 ws_spec.cell(row, col).number_format = "0.0"
 
