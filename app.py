@@ -8,7 +8,7 @@ root = Tk()
 from svod_parser_v1 import flat_column
 from svod_parser_v1 import start_process as st_v1
 
-root.title("Формирование спец")
+root.title("Формирование спец NEW")
 
 
 def validate_input(new_value):
