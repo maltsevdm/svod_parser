@@ -1,5 +1,3 @@
-from openpyxl.utils import column_index_from_string as cifs
-
 from common.enums import SvodHeaders
 
 from .enums import SpecColumn
@@ -10,7 +8,7 @@ ROW_COLUMNS = 2
 IMAGE_MAX_WIDTH = 100
 IMAGE_MAX_HEIGHT = 150
 
-ROW_MAIN_HEIGHT = 150
+ROW_MAIN_HEIGHT = 125
 ROW_MINOR_HEIGHT = 15
 
 
