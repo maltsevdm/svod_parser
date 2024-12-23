@@ -159,6 +159,7 @@ def main(flat_column: int, file_path: pathlib.Path) -> bool:
         for col_with_formula in [
             SvodHeaders.КОЛВО_ДЛЯ_ЗАКУПА_С_УЧЕТОМ_ЗАПАСА,
             SvodHeaders.КОЛВО_ДЛЯ_ЗАКУПА_С_РП,
+            SvodHeaders.МАТЕРИАЛЫ_ДЛЯ_ЗАКУПА_С_РП,
         ]:
             value = ws_svod_with_formulas.cell(row, sc[col_with_formula]).value
             if str(value).startswith("="):
