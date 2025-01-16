@@ -2,6 +2,7 @@ from openpyxl.worksheet.worksheet import Worksheet
 
 from common.consts import ROW_HEADERS
 from common.enums import SvodHeaders
+from common.exceptions import ColumnNotFound
 
 
 def get_svod_columns(ws: Worksheet) -> dict[str, int]:
@@ -18,7 +19,7 @@ def get_svod_columns(ws: Worksheet) -> dict[str, int]:
             h_value = h_value[:-1]
 
         if h_value not in headers:
-            raise Exception(f"Не удалось найти колонку {header}")
+            raise ColumnNotFound(f"Не удалось найти колонку {header}")
 
         h_index = headers.index(h_value)
         columns[header] = h_index + 1
