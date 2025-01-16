@@ -9,9 +9,10 @@ from openpyxl.styles import Alignment, Font, PatternFill
 from openpyxl.utils.cell import get_column_letter
 from openpyxl_image_loader import SheetImageLoader
 
+from common.enums import SvodHeaders
+from common.exceptions import ColumnNotFound
 from common.styles import GREEN_COLOR, thin_border
 from common.utils import get_svod_columns
-from common.enums import SvodHeaders
 
 from .consts import (
     IMAGE_MAX_HEIGHT,
@@ -24,7 +25,6 @@ from .consts import (
     static_rows,
 )
 from .enums import SpecColumn
-from .exceptions import ColumnNotFound
 from .utils import transform_formula
 
 current_dir = os.path.dirname(os.path.abspath(__file__))
