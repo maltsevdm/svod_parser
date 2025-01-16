@@ -37,7 +37,7 @@ jobs:
     
     # Сохраняем артефакты (exe файл) для скачивания
     - name: Upload artifact
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: свод-парсер
         path: dist/
