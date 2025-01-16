@@ -33,7 +33,7 @@ jobs:
     # Собираем exe
     - name: Build EXE
       run: |
-        pyinstaller --noconfirm --onefile -w --add-data "svod_parser_v1:svod_parser_v1/" --add-data "svod_parser_v2:svod_parser_v2/" -n "Svod parser" "app.py"
+        pyinstaller --noconfirm --onefile --add-data "svod_parser_v1:svod_parser_v1/" --add-data "svod_parser_v2:svod_parser_v2/" -n "Svod parser" "app.py"
     
     # Сохраняем артефакты (exe файл) для скачивания
     - name: Upload artifact
