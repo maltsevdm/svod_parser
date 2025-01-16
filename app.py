@@ -1,12 +1,11 @@
 from tkinter import Tk, ttk
 
-from svod_parser_v2 import start_process as st_v2
-
 root = Tk()
 
 
-from svod_parser_v1 import flat_column
+from common.consts import flat_column
 from svod_parser_v1 import start_process as st_v1
+from svod_parser_v2 import start_process as st_v2
 
 root.title("Формирование спец NEW")
 

@@ -7,28 +7,28 @@ from openpyxl import load_workbook
 from openpyxl.drawing.image import Image
 from openpyxl.styles import Alignment, Font, PatternFill
 from openpyxl.utils.cell import get_column_letter
-from openpyxl.worksheet.worksheet import Worksheet
 from openpyxl_image_loader import SheetImageLoader
 
+from common.consts import (
+    SVOD_ROW_FLATS,
+    SVOD_ROW_NAMES,
+    SVOD_SHEET,
+    flat_column,
+    svod_static_rows,
+)
 from common.enums import SvodHeaders
 from common.exceptions import ColumnNotFound
 from common.styles import GREEN_COLOR, thin_border
-from common.utils import get_svod_columns
+from common.utils import find_flat_column_index, get_svod_columns
 
 from .consts import (
     COL_L_FORMULA,
     IMAGE_MAX_HEIGHT,
     IMAGE_MAX_WIDTH,
-    ROW_COLUMNS,
-    ROW_FLATS,
     ROW_MAIN_HEIGHT,
     ROW_MINOR_HEIGHT,
-    ROW_NAMES,
-    SVOD_SHEET,
     TEMPLATE_FILENAME,
     columns_relation,
-    flat_column,
-    static_rows,
 )
 from .enums import SpecColumn
 from .utils import transform_formula
@@ -49,15 +49,6 @@ def start_process():
     except Exception as ex:
         logging.exception(ex)
         messagebox.showerror("Ошибка", "Произошла непредвиденная ошибка")
-
-
-def find_flat_column_index(ws: Worksheet, flat_column: int) -> int | None:
-    for col in range(1, ws.max_column + 1):
-        if ws.cell(ROW_COLUMNS, col).value == flat_column:
-            return col
-    messagebox.showerror(
-        "Ошибка", f"В строке {ROW_COLUMNS} не найдена колонка {flat_column}"
-    )
 
 
 def main(flat_column: int, file_path: pathlib.Path) -> bool:
@@ -83,7 +74,7 @@ def main(flat_column: int, file_path: pathlib.Path) -> bool:
     if not flat_column_i:
         return False
 
-    flat = ws_svod.cell(ROW_FLATS, flat_column_i).value
+    flat = ws_svod.cell(SVOD_ROW_FLATS, flat_column_i).value
 
     ws_spec.title = str(flat)
 
@@ -94,12 +85,11 @@ def main(flat_column: int, file_path: pathlib.Path) -> bool:
     ws_spec.cell(
         1,
         SpecColumn.КОЛВО_ДЛЯ_ЗАКУПА_С_РП + 1,
-        ws_svod.cell(ROW_NAMES, flat_column_i).value,
+        ws_svod.cell(SVOD_ROW_NAMES, flat_column_i).value,
     )
 
     i = 1
 
-    
     try:
         image_loader = SheetImageLoader(ws_svod)
     except IndexError as ex:
@@ -113,9 +103,9 @@ def main(flat_column: int, file_path: pathlib.Path) -> bool:
         raise ex
 
     # Переносим данные
-    for row in range(ROW_FLATS + 1, ws_svod.max_row + 1):
+    for row in range(SVOD_ROW_FLATS + 1, ws_svod.max_row + 1):
         col_static = sc[SvodHeaders.НАИМЕНОВАНИЕ_ПО_ПРОЕКТУ]
-        if str(ws_svod.cell(row, col_static).value).lower() in static_rows:
+        if str(ws_svod.cell(row, col_static).value).lower() in svod_static_rows:
             ws_spec.cell(
                 row_spec,
                 1,
@@ -200,7 +190,7 @@ def main(flat_column: int, file_path: pathlib.Path) -> bool:
         if not ws_spec.cell(row, 1).value:
             break
 
-        if str(ws_spec.cell(row, 1).value).lower() in static_rows:
+        if str(ws_spec.cell(row, 1).value).lower() in svod_static_rows:
             ws_spec.row_dimensions[row].height = ROW_MINOR_HEIGHT
             ws_spec.merge_cells(
                 start_row=row,

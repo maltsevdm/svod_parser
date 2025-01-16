@@ -4,26 +4,12 @@ from .enums import SpecColumn
 
 TEMPLATE_FILENAME = "template.xlsx"
 
-ROW_COLUMNS = 2
 IMAGE_MAX_WIDTH = 100
 IMAGE_MAX_HEIGHT = 150
 
 ROW_MAIN_HEIGHT = 125
 ROW_MINOR_HEIGHT = 15
 
-
-SVOD_SHEET = "Свод"
-
-static_rows = [
-    "отделка пола",
-    "отделка стен",
-    "отделка потолка",
-    "светильники, розетки и выключатели",
-    "мебель и декор",
-    "бытовая техника",
-    "сантехника",
-    "двери и комплектующие",
-]
 
 columns_relation = {
     SvodHeaders.НАИМЕНОВАНИЕ_ПО_ПРОЕКТУ: SpecColumn.НАИМЕНОВАНИЕ_ПО_ПРОЕКТУ,

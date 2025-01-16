@@ -1,4 +1,3 @@
-from tkinter import IntVar
 
 from common.enums import SvodHeaders
 
@@ -6,32 +5,14 @@ from .enums import SpecColumn
 
 TEMPLATE_FILENAME = "template.xlsx"
 
-ROW_COLUMNS = 2
 IMAGE_MAX_WIDTH = 100
 IMAGE_MAX_HEIGHT = 125
 
 ROW_MAIN_HEIGHT = 125
 ROW_MINOR_HEIGHT = 15
 
-ROW_NAMES = 5
-ROW_FLATS = 7
-
 COL_L_FORMULA = "=M{row}*(1+N{row})"
 COL_M_FORMULA = "=R{row}"
-
-SVOD_SHEET = "Свод"
-
-static_rows = [
-    "отделка пола",
-    "отделка стен",
-    "отделка потолка",
-    "светильники,  розетки и выключатели",
-    "светильники, розетки и выключатели",
-    "мебель и декор",
-    "бытовая техника",
-    "сантехника",
-    "двери и комплектующие",
-]
 
 columns_relation = {
     SvodHeaders.НАИМЕНОВАНИЕ_ПО_ПРОЕКТУ: SpecColumn.НАИМЕНОВАНИЕ_ПО_ПРОЕКТУ,
@@ -48,4 +29,3 @@ columns_relation = {
     SvodHeaders.ЕД_ИЗМ_3: SpecColumn.ЕД_ИЗМ_3,
     SvodHeaders.МАТЕРИАЛЫ_ДЛЯ_ЗАКУПА_С_РП: SpecColumn.МАТЕРИАЛЫ_ДЛЯ_ЗАКУПА_С_РП,
 }
-flat_column = IntVar(value=0)

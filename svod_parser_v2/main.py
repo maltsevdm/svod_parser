@@ -9,20 +9,24 @@ from openpyxl.styles import Alignment, Font, PatternFill
 from openpyxl.utils.cell import get_column_letter
 from openpyxl_image_loader import SheetImageLoader
 
+from common.consts import (
+    flat_column,
+    SVOD_ROW_FLATS,
+    SVOD_SHEET,
+    svod_static_rows,
+)
 from common.enums import SvodHeaders
 from common.exceptions import ColumnNotFound
 from common.styles import GREEN_COLOR, thin_border
-from common.utils import get_svod_columns
+from common.utils import find_flat_column_index, get_svod_columns
 
 from .consts import (
     IMAGE_MAX_HEIGHT,
     IMAGE_MAX_WIDTH,
     ROW_MAIN_HEIGHT,
     ROW_MINOR_HEIGHT,
-    SVOD_SHEET,
     TEMPLATE_FILENAME,
     columns_relation,
-    static_rows,
 )
 from .enums import SpecColumn
 from .utils import transform_formula
@@ -38,14 +42,14 @@ def start_process():
         )
     )
     try:
-        if main(file_path):
+        if main(flat_column.get(), file_path):
             messagebox.showinfo("Информация", "Готово")
     except Exception as ex:
         logging.exception(ex)
         messagebox.showerror("Ошибка", "Произошла непредвиденная ошибка")
 
 
-def main(file_path: pathlib.Path) -> bool:
+def main(flat_column: int, file_path: pathlib.Path) -> bool:
     wb_source_with_formulas = load_workbook(file_path)
     try:
         ws_svod = wb_source_with_formulas[SVOD_SHEET]
@@ -55,7 +59,7 @@ def main(file_path: pathlib.Path) -> bool:
             f'В загруженном файле нет листа "{SVOD_SHEET}", я умею работать только с таким листом',
         )
         return
-    
+
     wb_src = load_workbook(file_path, data_only=True)
     ws_svod_do = wb_src[SVOD_SHEET]
 
@@ -63,6 +67,14 @@ def main(file_path: pathlib.Path) -> bool:
     ws_spec = wb_new.active
 
     sc = get_svod_columns(ws_svod)
+
+    flat_column_i = find_flat_column_index(ws_svod, flat_column)
+    if not flat_column_i:
+        return False
+
+    flat = ws_svod.cell(SVOD_ROW_FLATS, flat_column_i).value
+
+    ws_spec.title = str(flat)
 
     row_spec = 8
 
@@ -82,7 +94,7 @@ def main(file_path: pathlib.Path) -> bool:
 
     # Переносим данные
     for row in range(9, ws_svod.max_row + 1):
-        if str(ws_svod.cell(row, 3).value).lower() in static_rows:
+        if str(ws_svod.cell(row, 3).value).lower() in svod_static_rows:
             ws_spec.cell(
                 row_spec,
                 SpecColumn.НОМЕР,
@@ -91,6 +103,9 @@ def main(file_path: pathlib.Path) -> bool:
             row_spec += 1
             continue
 
+        if not ws_svod.cell(row, flat_column_i).value:
+            continue
+        
         cell_address = f"{get_column_letter(sc[SvodHeaders.ВНЕШНИЙ_ВИД])}{row}"
 
         if image_loader.image_in(cell_address):
@@ -124,7 +139,7 @@ def main(file_path: pathlib.Path) -> bool:
                 ws_sv = ws_svod_do
             else:
                 ws_sv = ws_svod
-            
+
             col_from = sc[col_from_h]
             value = ws_sv.cell(row, col_from).value
             if str(value).startswith("="):
@@ -150,7 +165,7 @@ def main(file_path: pathlib.Path) -> bool:
         if not ws_spec.cell(row, 1).value:
             break
 
-        if str(ws_spec.cell(row, SpecColumn.НОМЕР).value).lower() in static_rows:
+        if str(ws_spec.cell(row, SpecColumn.НОМЕР).value).lower() in svod_static_rows:
             ws_spec.row_dimensions[row].height = ROW_MINOR_HEIGHT
             ws_spec.merge_cells(
                 start_row=row,
