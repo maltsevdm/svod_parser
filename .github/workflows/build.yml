@@ -1,0 +1,43 @@
+name: Build EXE
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: windows-latest
+
+    steps:
+    # Скачиваем код репозитория
+    - name: Checkout code
+      uses: actions/checkout@v3
+
+    # Устанавливаем Python
+    - name: Setup Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.12'
+
+    # Устанавливаем зависимости
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install pyinstaller
+        pip install -r requirements.txt
+
+    # Собираем exe
+    - name: Build EXE
+      run: |
+        pyinstaller --noconfirm --onefile -w --add-data "svod_parser_v1:svod_parser_v1/" --add-data "svod_parser_v2:svod_parser_v2/" -n "Svod parser" "app.py"
+    
+    # Сохраняем артефакты (exe файл) для скачивания
+    - name: Upload artifact
+      uses: actions/upload-artifact@v3
+      with:
+        name: свод-парсер
+        path: dist/
