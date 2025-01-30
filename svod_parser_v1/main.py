@@ -1,6 +1,8 @@
 import logging
 import os
 import pathlib
+import time
+import traceback
 from tkinter import filedialog, messagebox
 
 from openpyxl import load_workbook
@@ -48,6 +50,8 @@ def start_process():
             messagebox.showinfo("Информация", "Готово")
     except Exception as ex:
         logging.exception(ex)
+        with open(f"error-var1-{int(time.time())}.txt", "w") as f:
+            traceback.print_exc(file=f)
         messagebox.showerror("Ошибка", "Произошла непредвиденная ошибка")
 
 
