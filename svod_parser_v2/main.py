@@ -7,18 +7,18 @@ from openpyxl import load_workbook
 from openpyxl.drawing.image import Image
 from openpyxl.styles import Alignment, Font, PatternFill
 from openpyxl.utils.cell import get_column_letter
-from openpyxl_image_loader import SheetImageLoader
 
 from common.consts import (
-    flat_column,
     SVOD_ROW_FLATS,
     SVOD_SHEET,
+    flat_column,
     svod_static_rows,
 )
 from common.enums import SvodHeaders
 from common.exceptions import ColumnNotFound
 from common.styles import GREEN_COLOR, thin_border
 from common.utils import find_flat_column_index, get_svod_columns
+from sheet_image_loader import CustomSheetImageLoader
 
 from .consts import (
     IMAGE_MAX_HEIGHT,
@@ -80,17 +80,7 @@ def main(flat_column: int, file_path: pathlib.Path) -> bool:
 
     i = 1
 
-    try:
-        image_loader = SheetImageLoader(ws_svod)
-    except IndexError as ex:
-        if "string index out of range" in str(ex):
-            messagebox.showerror(
-                "Ошибка",
-                "В своде скорее всего есть картинки в столбцах кроме Внешний вид. "
-                "Удалите их и попробуйте снова.",
-            )
-            return
-        raise ex
+    image_loader = CustomSheetImageLoader(ws_svod)
 
     # Переносим данные
     for row in range(9, ws_svod.max_row + 1):
@@ -105,7 +95,7 @@ def main(flat_column: int, file_path: pathlib.Path) -> bool:
 
         if not ws_svod.cell(row, flat_column_i).value:
             continue
-        
+
         cell_address = f"{get_column_letter(sc[SvodHeaders.ВНЕШНИЙ_ВИД])}{row}"
 
         if image_loader.image_in(cell_address):
